@@ -1,20 +1,22 @@
+import 'package:dumy_project/screens/invoice.dart';
+import 'package:dumy_project/screens/pdf.dart';
 import 'package:flutter/material.dart';
-import 'package:invoic_generator/screens/firstpage.dart';
-import 'package:invoic_generator/screens/secondpage.dart';
-void main()
-{
-  runApp(invoice());
+
+void main() {
+  runApp(const InvoiceGenerator());
 }
-class invoice extends StatelessWidget {
-  const invoice({super.key});
+
+class InvoiceGenerator extends StatelessWidget {
+  const InvoiceGenerator({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
       routes: {
-        '/sc':(context) => Invoice_gen(),
-        '/':(context) =>generator(),
+        '/': (context) => Details(),
+        '/pdf': (context) => pdfPage(),
       },
     );
   }
