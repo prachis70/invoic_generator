@@ -1,155 +1,121 @@
 
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:invoic_generator/screens/secondpage.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
-class Invoice_gen extends StatefulWidget {
-  const Invoice_gen({super.key});
+import 'global.dart';
+
+
+class Details extends StatefulWidget {
+  const Details({super.key});
 
   @override
-  State<Invoice_gen> createState() => _Invoice_genState();
+  State<Details> createState() => _DetailsState();
 }
 
-List amountList = [];
-
-class _Invoice_genState extends State<Invoice_gen> {
+class _DetailsState extends State<Details> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff1C1B1F),
       appBar: AppBar(
-        backgroundColor: Color(0xff1C1B1F),
-        leading: InkWell(
-            onTap: () {
-
-              Navigator.of(context).pop();
-            },
-            child: Icon(CupertinoIcons.back,color: Colors.white,)),
-        title: Text(
-          'Invoice',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        leading: Icon(
+          Icons.menu,
+          color: Colors.white,
         ),
+        title: Text(
+          'Invoice Generator',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed('/pdf');
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Icon(Icons.print,color: Colors.white,),
+              ))
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Table(
-                border: TableBorder.all(color: Colors.white, width: 1),
+            ...List.generate(
+              ProductList.length,
+                  (index) => Column(
                 children: [
-                  TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Iteams',
-                          style: TextStyle(color: Colors.red, fontSize: 15),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Container(
+                      height: 80,
+                      width: 500,
+                      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0, 2),
+                          blurRadius: 2,
+                          spreadRadius: 2,
+                        )
+                      ]),
+                      child: ListTile(
+                        leading: Text((index + 1).toString()),
+                        title: Text(ProductList[index].name!),
+                        subtitle: Text(ProductList[index].category!),
+                        trailing: Text(ProductList[index].price!),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'ProQty',
-                          style: TextStyle(color: Colors.red, fontSize: 15),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'ProPrice',
-                          style: TextStyle(color: Colors.red, fontSize: 15),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Amount',
-                          style: TextStyle(color: Colors.red, fontSize: 15),
-                        ),
-                      ),
-                    ],
-                  ),
-                  ...List.generate(
-                    ProductList.length,
-                        (index) => TableRow(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '${ProductList[index].productName!.text}',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '${ProductList[index].productQty!.text}',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '${ProductList[index].productPrice!.text}',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '${amountList[index]}',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
-            ),
-            SizedBox(height: 250,),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Total : ',style: TextStyle(color: Colors.red,fontSize: 25,fontWeight: FontWeight.bold),),
-                  Text('${total}',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 25),)
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('GST : ',style: TextStyle(color: Colors.red,fontSize: 25,fontWeight: FontWeight.bold),),
-                  Text('18%',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 25),)
-                ],
-              ),
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 10,top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Total Pay : ',style: TextStyle(color: Colors.red,fontSize: 25,fontWeight: FontWeight.bold),),
-                  Text('${pay}',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 25),)
-                ],
-              ),
-            ),
-            Divider(),
+            )
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            ProductList.add(ProductModel(
+                name: 'AC', category: 'HouseHold', price: '50000'));
+          });
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
 }
-double amount = 0;
-double total = 0;
-double gst = 0;
-double pay = 0;
+Future<Uint8List> generatePdf() async {
+  final pdf = pw.Document();
+  pdf.addPage(
+    pw.Page(
+        build: (context) => pw.Row(children: [
+          pw.Column(
+              children: List.generate(
+                ProductList.length,
+                    (index) => pw.Text(
+                    '${ProductList[index].name}\t\t\t\t\t\t\t\t\t\t\t \n\n\n',
+                    style: pw.TextStyle(
+                      fontSize: 25,
+                    )),
+              )),
+          pw.Column(
+              children: List.generate(
+                ProductList.length,
+                    (index) => pw.Text('${ProductList[index].price}\t\t\t\t\t\t\t\t\t\t\t \n\n\n',
+                    style: pw.TextStyle(fontSize: 25)),
+              )),
+          pw.Column(
+              children: List.generate(
+                ProductList.length,
+                    (index) => pw.Text(
+                    '${ProductList[index].category}\t\t\t\t\t\t\t\t\t\t\t \n\n\n',
+                    style: pw.TextStyle(fontSize: 25)),
+              )),
+        ])),
+  );
+  return pdf.save();
+}
